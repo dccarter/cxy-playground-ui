@@ -10,4 +10,6 @@ RUN bunx --bun vite build
 FROM suilteam/cxyfs:latest 
 RUN mkdir -p /etc/cxy-playground
 COPY --from=builder /app/dist /etc/cxy-playground/www
-ENV CXY_WWW_DIR=/etc/cxy-playground/www
+# Create the default configuration
+RUN echo '{"root":"/etc/cxy-playground/www"}' > /etc/cxy-playground/cxyfs.json
+ENV CXY_FS_CONFIG=/etc/cxy-playground/cxyfs.json
