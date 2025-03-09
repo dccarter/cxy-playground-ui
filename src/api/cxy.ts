@@ -1,8 +1,8 @@
-import { apiServerHost } from "@/constants";
+import { apiServerUri } from "@/constants";
 import { ActionId } from "@/types";
 
 class Cxy {
-  constructor(private serverHost: string) {}
+  constructor(private serverUri: string) {}
 
   buildOutput(data: { stdout?: string; stderr?: string; status: number }) {
     const output = data.stdout ? atob(data.stdout) : "";
@@ -11,8 +11,17 @@ class Cxy {
     return output;
   }
 
+  async checkResponse(response: Response) {
+    if (!response.ok) {
+      throw new Error(
+        `HTTP error! status: ${response.status} ${await response.text()}`
+      );
+    }
+    return response;
+  }
+
   async build(code: string, args?: string) {
-    const response = await fetch(`http://${this.serverHost}/build`, {
+    const response = await fetch(`${this.serverUri}/build`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -20,12 +29,13 @@ class Cxy {
       },
       body: JSON.stringify({ code: btoa(code), args }),
     });
+    await this.checkResponse(response);
     const data = await response.json();
     return this.buildOutput(data);
   }
 
   async run(code: string, args: string) {
-    const response = await fetch(`http://${this.serverHost}/run`, {
+    const response = await fetch(`${this.serverUri}/run`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -33,7 +43,7 @@ class Cxy {
       },
       body: JSON.stringify({ code: btoa(code), args }),
     });
-
+    await this.checkResponse(response);
     const data = await response.json();
     if (data.build && data.build.status !== 0) {
       return this.buildOutput(data.build);
@@ -47,7 +57,7 @@ class Cxy {
   }
 
   async test(code: string, args: string) {
-    const response = await fetch(`http://${this.serverHost}/test`, {
+    const response = await fetch(`${this.serverUri}/test`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -56,12 +66,13 @@ class Cxy {
       body: JSON.stringify({ code: btoa(code), args }),
     });
 
+    await this.checkResponse(response);
     const data = await response.json();
     return this.buildOutput(data);
   }
 
   async getGeneratedCode(code: string, args: string) {
-    const response = await fetch(`http://${this.serverHost}/source`, {
+    const response = await fetch(`${this.serverUri}/source`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -70,6 +81,7 @@ class Cxy {
       body: JSON.stringify({ code: btoa(code), args }),
     });
 
+    await this.checkResponse(response);
     if (response.headers.get("Content-Type") === "text/plain") {
       return { ok: true, data: await response.text() };
     }
@@ -93,4 +105,4 @@ class Cxy {
   }
 }
 
-export const cxyCompiler = new Cxy(apiServerHost);
+export const cxyCompiler = new Cxy(apiServerUri);

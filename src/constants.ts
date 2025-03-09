@@ -11,5 +11,6 @@ func main() {
 }
 `;
 
-export const apiServerHost =
-  import.meta.env.VITE_CXY_API_SERVER || "http://localhost:8080";
+const apiServerHost = import.meta.env.VITE_CXY_API_SERVER ?? "localhost:8080";
+const apiServerProtocol = import.meta.env.VITE_API_PROTOCOL ?? "http";
+export const apiServerUri = `${apiServerProtocol}://${apiServerHost}`;
