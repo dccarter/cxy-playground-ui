@@ -7,7 +7,7 @@ WORKDIR /app
 RUN bun install
 RUN bunx --bun vite build
 
-FROM suilteam/cxyfs:latest 
+FROM suilteam/cxyfs:alpine-latest 
 RUN mkdir -p /etc/cxy-playground
 COPY --from=builder /app/dist /etc/cxy-playground/www
 # Create the default configuration
