@@ -72,6 +72,7 @@ const ActionButton = ({
       <Button
         className={cn("py-2 h-full w-full rounded-r-none", {
           "cursor-not-allowed": disabled,
+          "hover:cursor-pointer": !disabled,
         })}
         onClick={handleActionClicked}
       >
@@ -79,7 +80,12 @@ const ActionButton = ({
       </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild disabled={disabled}>
-          <Button className="rounded-l-none">
+          <Button
+            className={cn("rounded-l-none hover:cursor-pointer", {
+              "cursor-not-allowed": disabled,
+              "hover:cursor-pointer": !disabled,
+            })}
+          >
             <ChevronRight className="transform transition-transform duration-300 hover:rotate-90" />
           </Button>
         </DropdownMenuTrigger>
